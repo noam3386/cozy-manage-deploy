@@ -1,0 +1,7 @@
+project_id = "ftwxfyjqjiqrqymrnazl"
+
+[functions.send-push-notification]
+verify_jwt = false
+
+[functions.database-webhook-notifications]
+verify_jwt = false

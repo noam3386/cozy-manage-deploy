@@ -1,0 +1,218 @@
+import { Property, ServiceRequest, Issue, Payment, Task, Booking, Vendor } from '@/types';
+
+export const mockProperties: Property[] = [
+  {
+    id: '1',
+    name: 'דירת יוקרה בתל אביב',
+    address: 'רוטשילד 45, תל אביב',
+    floor: '8',
+    size: 120,
+    status: 'occupied',
+    ownerId: 'owner1',
+    doorCode: '1234',
+    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
+  },
+  {
+    id: '2',
+    name: 'סטודיו מודרני בפלורנטין',
+    address: 'הברזל 12, תל אביב',
+    floor: '3',
+    size: 45,
+    status: 'vacant',
+    ownerId: 'owner1',
+    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
+  },
+  {
+    id: '3',
+    name: 'פנטהאוז בהרצליה פיתוח',
+    address: 'המרגנית 8, הרצליה',
+    floor: '12',
+    size: 200,
+    status: 'preparing',
+    ownerId: 'owner1',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+  },
+];
+
+export const mockBookings: Booking[] = [
+  {
+    id: 'b1',
+    propertyId: '1',
+    startDate: '2025-01-02',
+    endDate: '2025-01-08',
+    guestCount: 4,
+    source: 'airbnb',
+    status: 'confirmed',
+  },
+  {
+    id: 'b2',
+    propertyId: '3',
+    startDate: '2025-01-05',
+    endDate: '2025-01-12',
+    guestCount: 6,
+    source: 'booking',
+    status: 'confirmed',
+  },
+];
+
+export const mockServiceRequests: ServiceRequest[] = [
+  {
+    id: 's1',
+    propertyId: '1',
+    type: 'cleaning',
+    status: 'confirmed',
+    date: '2025-01-02',
+    time: '10:00',
+    price: 350,
+    createdAt: '2024-12-20',
+  },
+  {
+    id: 's2',
+    propertyId: '3',
+    type: 'beds',
+    status: 'new',
+    date: '2025-01-05',
+    notes: '3 מיטות זוגיות + 2 יחיד',
+    createdAt: '2024-12-22',
+  },
+  {
+    id: 's3',
+    propertyId: '2',
+    type: 'windows',
+    status: 'in_progress',
+    date: '2024-12-28',
+    price: 450,
+    createdAt: '2024-12-18',
+  },
+];
+
+export const mockIssues: Issue[] = [
+  {
+    id: 'i1',
+    propertyId: '1',
+    category: 'ac',
+    priority: 'high',
+    title: 'מזגן לא מקרר',
+    description: 'המזגן בסלון עובד אבל לא מקרר כמו שצריך. האורחים מתלוננים.',
+    status: 'assigned',
+    approvedBudget: 500,
+    createdAt: '2024-12-20',
+    updatedAt: '2024-12-21',
+  },
+  {
+    id: 'i2',
+    propertyId: '2',
+    category: 'plumbing',
+    priority: 'emergency',
+    title: 'נזילה מהתקרה',
+    description: 'נזילת מים מהתקרה באמבטיה. צריך טיפול דחוף!',
+    status: 'in_progress',
+    approvedBudget: 2000,
+    images: ['https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400'],
+    createdAt: '2024-12-23',
+    updatedAt: '2024-12-24',
+  },
+];
+
+export const mockPayments: Payment[] = [
+  {
+    id: 'p1',
+    ownerId: 'owner1',
+    type: 'monthly_fee',
+    amount: 1500,
+    status: 'pending',
+    dueDate: '2025-01-01',
+    description: 'דמי ניהול חודשיים - ינואר',
+  },
+  {
+    id: 'p2',
+    ownerId: 'owner1',
+    propertyId: '1',
+    type: 'service',
+    amount: 350,
+    status: 'paid',
+    dueDate: '2024-12-25',
+    paidDate: '2024-12-23',
+    description: 'ניקיון - דירת רוטשילד',
+  },
+  {
+    id: 'p3',
+    ownerId: 'owner1',
+    propertyId: '2',
+    type: 'repair',
+    amount: 850,
+    status: 'pending',
+    dueDate: '2025-01-05',
+    description: 'תיקון נזילה - סטודיו פלורנטין',
+  },
+];
+
+export const mockTasks: Task[] = [
+  {
+    id: 't1',
+    propertyId: '1',
+    type: 'cleaning',
+    status: 'scheduled',
+    dueDate: '2025-01-02',
+    description: 'ניקיון לפני הגעת אורחים',
+    priority: 'high',
+    assignedTo: 'צוות ניקיון א',
+  },
+  {
+    id: 't2',
+    propertyId: '3',
+    type: 'beds',
+    status: 'new',
+    dueDate: '2025-01-05',
+    description: 'הכנת מיטות - 3 זוגיות, 2 יחיד',
+    priority: 'high',
+  },
+  {
+    id: 't3',
+    propertyId: '2',
+    type: 'repair',
+    status: 'in_progress',
+    dueDate: '2024-12-24',
+    description: 'תיקון נזילה מהתקרה',
+    priority: 'high',
+    assignedTo: 'אינסטלטור דוד',
+  },
+  {
+    id: 't4',
+    propertyId: '1',
+    type: 'windows',
+    status: 'pending_approval',
+    dueDate: '2024-12-30',
+    description: 'ניקוי חלונות - דירת רוטשילד',
+    priority: 'normal',
+  },
+];
+
+export const mockVendors: Vendor[] = [
+  {
+    id: 'v1',
+    name: 'דוד אינסטלציה',
+    specialty: ['plumbing', 'leak'],
+    phone: '050-1234567',
+    email: 'david@plumber.co.il',
+    rating: 'excellent',
+    areas: ['תל אביב', 'רמת גן', 'גבעתיים'],
+  },
+  {
+    id: 'v2',
+    name: 'מוישה חשמלאי',
+    specialty: ['electric'],
+    phone: '052-7654321',
+    rating: 'good',
+    areas: ['תל אביב', 'הרצליה'],
+  },
+  {
+    id: 'v3',
+    name: 'ניקיון פלוס',
+    specialty: ['cleaning', 'windows'],
+    phone: '03-5555555',
+    email: 'info@cleanplus.co.il',
+    rating: 'excellent',
+    areas: ['כל המרכז'],
+  },
+];
