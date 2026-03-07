@@ -1,7 +1,7 @@
+import "./i18n";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import "./i18n";
 
 // Register push notification service worker as early as possible
 // This ensures it's active even when the app is closed
