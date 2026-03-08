@@ -15,10 +15,10 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "pwa-192x192.png", "pwa-512x512.png"],
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "pwa-192x192.png", "pwa-512x512.png", "_redirects"],
       manifest: {
-        name: "ניהול נכסים",
-        short_name: "נכסים",
+        name: "Concierge Me",
+        short_name: "Concierge",
         description: "מערכת ניהול נכסים והשכרות",
         theme_color: "#1a1a2e",
         background_color: "#1a1a2e",
