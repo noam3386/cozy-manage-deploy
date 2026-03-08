@@ -10,7 +10,8 @@ i18n.use(initReactI18next).init({
   resources: { he: { translation: he }, en: { translation: en }, fr: { translation: fr } },
   lng: savedLanguage,
   fallbackLng: 'he',
-  interpolation: { escapeValue: false },
+interpolation: { escapeValue: false },
+  initImmediate: false,
 });
 
 export const getDirection = (lang?: string): 'rtl' | 'ltr' => {
