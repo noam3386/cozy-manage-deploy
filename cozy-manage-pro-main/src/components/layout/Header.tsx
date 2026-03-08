@@ -9,6 +9,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '@/components/LanguageSelector';
 import {
   Dialog,
   DialogContent,
@@ -113,6 +114,7 @@ export function Header({ onMenuClick, title }: HeaderProps) {
           </div>
           
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <Link to={effectiveRole === 'manager' ? '/manager/requests' : '/owner/messages'}>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />

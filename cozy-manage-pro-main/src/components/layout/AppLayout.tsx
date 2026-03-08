@@ -29,6 +29,7 @@ const pageTitleKeys: Record<string, string> = {
   '/manager/vendors': 'pageTitles.vendors',
   '/manager/inspections': 'pageTitles.apartmentInspections',
   '/manager/cleaning-records': 'pageTitles.cleaningRecords',
+  '/manager/reminders': 'pageTitles.reminders',
 };
 
 export function AppLayout() {

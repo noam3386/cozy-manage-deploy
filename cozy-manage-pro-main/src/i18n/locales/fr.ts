@@ -21,6 +21,7 @@ export default {
     propertyActions: 'Actions sur Propriétés',
     vendors: 'Fournisseurs',
     signOut: 'Déconnexion',
+    reminders: 'Rappels & Alertes',
   },
   roles: { owner: 'Propriétaire', manager: 'Gestionnaire Immobilier' },
   pageTitles: {
@@ -41,6 +42,7 @@ export default {
     vendors: 'Fournisseurs',
     apartmentInspections: 'Inspections des Appartements',
     cleaningRecords: 'Registres de Nettoyage',
+    reminders: 'Rappels & Alertes',
   },
   settings: {
     title: 'Paramètres',

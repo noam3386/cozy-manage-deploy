@@ -166,11 +166,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-sidebar-border">
+          <div className="p-4 border-b border-sidebar-border">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-bold text-sidebar-primary-foreground">PropManager</h1>
-                <p className="text-sm text-sidebar-foreground/70 mt-0.5">{roleLabel}</p>
+              <div className="flex items-center gap-3">
+                <img src="/logo.jpg" alt="Concierge Me" className="h-10 w-10 rounded-lg object-contain bg-white" />
+                <div>
+                  <h1 className="text-lg font-bold text-sidebar-primary-foreground">Concierge Me</h1>
+                  <p className="text-xs text-sidebar-foreground/70">{roleLabel}</p>
+                </div>
               </div>
               <Button 
                 variant="ghost" 

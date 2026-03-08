@@ -29,6 +29,7 @@ import ManagerPropertyDetail from "@/pages/manager/ManagerPropertyDetail";
 import ManagerCalendar from "@/pages/manager/ManagerCalendar";
 import ManagerInspections from "@/pages/manager/ManagerInspections";
 import ManagerCleaningRecords from "@/pages/manager/ManagerCleaningRecords";
+import ManagerReminders from "@/pages/manager/ManagerReminders";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -106,6 +107,7 @@ const App = () => (
               <Route path="/manager/messages" element={<ManagerMessages />} />
               <Route path="/manager/inspections" element={<ManagerInspections />} />
               <Route path="/manager/cleaning" element={<ManagerCleaningRecords />} />
+              <Route path="/manager/reminders" element={<ManagerReminders />} />
             </Route>
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

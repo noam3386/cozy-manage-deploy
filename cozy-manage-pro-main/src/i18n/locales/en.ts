@@ -21,6 +21,7 @@ export default {
     propertyActions: 'Property Actions',
     vendors: 'Vendors',
     signOut: 'Sign Out',
+    reminders: 'Reminders & Alerts',
   },
   roles: { owner: 'Property Owner', manager: 'Property Manager' },
   pageTitles: {
@@ -41,6 +42,7 @@ export default {
     vendors: 'Vendors',
     apartmentInspections: 'Apartment Inspections',
     cleaningRecords: 'Cleaning Records',
+    reminders: 'Reminders & Alerts',
   },
   settings: {
     title: 'Settings',
