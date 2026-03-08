@@ -54,15 +54,16 @@ interface Inspection {
   property?: Property;
 }
 
-const checklistItems = [
-  { key: 'water_flow_check', label: t('inspections.checks.water'), icon: Droplets },
-  { key: 'moisture_check', label: t('inspections.checks.moisture'), icon: Droplets },
-  { key: 'ac_filters_check', label: t('inspections.checks.ac'), icon: Thermometer },
-  { key: 'electrical_lights_check', label: t('inspections.checks.electrical'), icon: Lightbulb },
-  { key: 'garden_check', label: t('inspections.checks.garden'), icon: Trees },
-];
-
 export default function ManagerInspections() {
+  const { t } = useTranslation();
+
+  const checklistItems = [
+    { key: 'water_flow_check', label: t('inspections.checks.water'), icon: Droplets },
+    { key: 'moisture_check', label: t('inspections.checks.moisture'), icon: Droplets },
+    { key: 'ac_filters_check', label: t('inspections.checks.ac'), icon: Thermometer },
+    { key: 'electrical_lights_check', label: t('inspections.checks.electrical'), icon: Lightbulb },
+    { key: 'garden_check', label: t('inspections.checks.garden'), icon: Trees },
+  ];
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [inspections, setInspections] = useState<Inspection[]>([]);
