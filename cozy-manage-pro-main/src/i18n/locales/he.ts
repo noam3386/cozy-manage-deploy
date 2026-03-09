@@ -1,4 +1,4 @@
-export default {
+﻿export default {
   language: 'שפה',
   languages: { he: 'עברית', en: 'English', fr: 'Français' },
   nav: {
