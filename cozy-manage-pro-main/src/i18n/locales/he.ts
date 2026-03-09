@@ -22,6 +22,7 @@ export default {
     vendors: 'ספקים',
     signOut: 'התנתקות',
     reminders: 'התראות ותזכורות',
+    vendorTasks: 'נותני שירות',
   },
   roles: { owner: 'בעל נכס', manager: 'מנהל נכסים' },
   pageTitles: {
@@ -43,6 +44,8 @@ export default {
     apartmentInspections: 'בדיקות דירות',
     cleaningRecords: 'רישום ניקיונות',
     reminders: 'התראות ותזכורות',
+    vendorTasks: 'ניהול נותני שירות',
+    vendorDashboard: 'המשימות שלי',
   },
   settings: {
     title: 'הגדרות',
