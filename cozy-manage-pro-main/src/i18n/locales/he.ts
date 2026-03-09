@@ -21,6 +21,8 @@ export default {
     propertyActions: 'פעולות נכסים',
     vendors: 'ספקים',
     signOut: 'התנתקות',
+reminders: 'התראות ותזכורות',
+vendorTasks: 'נותני שירות'
     reminders: 'התראות ותזכורות',
     vendorTasks: 'נותני שירות',
   },
