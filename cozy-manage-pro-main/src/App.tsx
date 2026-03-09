@@ -30,6 +30,8 @@ import ManagerCalendar from "@/pages/manager/ManagerCalendar";
 import ManagerInspections from "@/pages/manager/ManagerInspections";
 import ManagerCleaningRecords from "@/pages/manager/ManagerCleaningRecords";
 import ManagerReminders from "@/pages/manager/ManagerReminders";
+import ManagerVendorTasks from "@/pages/manager/ManagerVendorTasks";
+import VendorDashboard from "@/pages/vendor/VendorDashboard";
 import AdminUsers from "@/pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -53,7 +55,8 @@ const RoleRedirect = () => {
   }
 
   const isManager = role === 'manager' || role === 'admin';
-  return <Navigate to={isManager ? "/manager" : "/owner"} replace />;
+  const isVendor = role === 'vendor';
+  return <Navigate to={isManager ? "/manager" : isVendor ? "/vendor" : "/owner"} replace />;
 };
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -108,6 +111,8 @@ const App = () => (
               <Route path="/manager/inspections" element={<ManagerInspections />} />
               <Route path="/manager/cleaning" element={<ManagerCleaningRecords />} />
               <Route path="/manager/reminders" element={<ManagerReminders />} />
+              <Route path="/manager/vendor-tasks" element={<ManagerVendorTasks />} />
+              <Route path="/vendor" element={<VendorDashboard />} />
             </Route>
             <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
