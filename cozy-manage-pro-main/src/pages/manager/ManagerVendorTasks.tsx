@@ -94,6 +94,7 @@ export default function ManagerVendorTasks() {
       scheduled_date: taskForm.scheduled_date,
       scheduled_time: taskForm.scheduled_time || null,
       service_type: taskForm.service_type,
+      status: 'pending',
       trigger_type: 'manual',
       created_by: user?.id,
     });

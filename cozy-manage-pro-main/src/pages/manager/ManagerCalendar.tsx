@@ -78,6 +78,7 @@ interface Owner {
 type ViewMode = 'month' | 'timeline';
 
 export default function ManagerCalendar() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -101,7 +102,7 @@ export default function ManagerCalendar() {
         supabase.from('arrivals_departures').select('*')
           .gte('date', rangeStart)
           .lte('date', rangeEnd),
-        supabase.from('profiles').select('id, full_name').eq('role', 'owner')
+        supabase.from('profiles').select('id, full_name')
       ]);
 
       if (propertiesRes.data) setProperties(propertiesRes.data);

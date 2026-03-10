@@ -175,6 +175,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <div>
                 <h1 className="text-xl font-bold text-sidebar-primary-foreground">PropManager</h1>
                 <p className="text-sm text-sidebar-foreground/70 mt-0.5">{roleLabel}</p>
+                <p className="text-xs text-sidebar-foreground/40 mt-0.5">v1.2.0</p>
               </div>
               <Button 
                 variant="ghost" 

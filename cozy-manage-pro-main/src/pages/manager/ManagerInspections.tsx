@@ -216,6 +216,22 @@ export default function ManagerInspections() {
 
       if (error) throw error;
 
+      // שליחת התראה לבעל הנכס
+      try {
+        const property = properties?.find((p: any) => p.id === formData.property_id);
+        if (property && 'serviceWorker' in navigator && Notification.permission === 'granted') {
+          const reg = await navigator.serviceWorker.ready;
+          reg.showNotification('בדיקת דירה הושלמה 🏠', {
+            body: `בדיקה בנכס "${property.name}" הושלמה בהצלחה`,
+            icon: '/pwa-192x192.png',
+            dir: 'rtl',
+            tag: `inspection-${formData.property_id}`
+          });
+        }
+      } catch (notifErr) {
+        console.log('Notification failed:', notifErr);
+      }
+
       toast.success(t('inspections.inspectionSaved'));
       setIsDialogOpen(false);
       resetForm();

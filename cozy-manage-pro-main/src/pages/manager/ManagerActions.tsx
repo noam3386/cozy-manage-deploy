@@ -32,6 +32,14 @@ interface Task {
   property?: Property;
 }
 
+const taskTypeLabels: Record<string, string> = {
+  cleaning: 'ניקיון',
+  maintenance: 'תחזוקה',
+  inspection: 'בדיקה',
+  delivery: 'משלוח',
+  other: 'אחר',
+};
+
 export default function ManagerTasks() {
   const { t } = useTranslation();
 

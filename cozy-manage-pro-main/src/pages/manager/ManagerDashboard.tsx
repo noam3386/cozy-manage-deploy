@@ -8,16 +8,23 @@ import {
   ChevronLeft,
   Plane,
   CheckCircle2,
-  CalendarDays
+  CalendarDays,
+  Plus,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link, useNavigate } from 'react-router-dom';
 import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 import { he } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface Property {
   id: string;
@@ -73,6 +80,15 @@ export default function ManagerDashboard() {
   const [arrivals, setArrivals] = useState<ArrivalDeparture[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const navigate = useNavigate();
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    property_id: '',
+    start_date: format(new Date(), 'yyyy-MM-dd'),
+    end_date: '',
+    guest_count: '1',
+    status: 'confirmed'
+  });
+  const [savingBooking, setSavingBooking] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -136,6 +152,30 @@ export default function ManagerDashboard() {
   const pendingApprovals = serviceRequests.filter(r => r.status === 'confirmed');
   const todayArrivals = arrivals.filter(a => isToday(parseISO(a.date)));
 
+  const saveBooking = async () => {
+    if (!bookingForm.property_id || !bookingForm.start_date || !bookingForm.end_date) {
+      toast.error('נא למלא נכס, תאריך התחלה ותאריך סיום');
+      return;
+    }
+    setSavingBooking(true);
+    const { error } = await supabase.from('bookings').insert({
+      property_id: bookingForm.property_id,
+      start_date: bookingForm.start_date,
+      end_date: bookingForm.end_date,
+      guest_count: parseInt(bookingForm.guest_count) || 1,
+      status: bookingForm.status,
+    });
+    setSavingBooking(false);
+    if (error) {
+      toast.error('שגיאה בשמירת ההגעה');
+      return;
+    }
+    toast.success('ההגעה נוספה בהצלחה');
+    setBookingOpen(false);
+    setBookingForm({ property_id: '', start_date: format(new Date(), 'yyyy-MM-dd'), end_date: '', guest_count: '1', status: 'confirmed' });
+    fetchData();
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -150,6 +190,64 @@ export default function ManagerDashboard() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Quick action button */}
+      <div className="flex justify-end">
+        <Button onClick={() => setBookingOpen(true)}>
+          <Plus className="h-4 w-4 ml-2" />
+          הוסף הגעה
+        </Button>
+      </div>
+
+      {/* Booking Dialog */}
+      <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
+        <DialogContent dir="rtl" className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>הוספת הגעה / תפוסה</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>נכס *</Label>
+              <Select value={bookingForm.property_id} onValueChange={v => setBookingForm(p => ({ ...p, property_id: v }))}>
+                <SelectTrigger><SelectValue placeholder="בחר נכס..." /></SelectTrigger>
+                <SelectContent>
+                  {properties.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>תאריך הגעה *</Label>
+                <Input type="date" value={bookingForm.start_date} onChange={e => setBookingForm(p => ({ ...p, start_date: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>תאריך עזיבה *</Label>
+                <Input type="date" value={bookingForm.end_date} onChange={e => setBookingForm(p => ({ ...p, end_date: e.target.value }))} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>מספר אורחים</Label>
+                <Input type="number" min="1" value={bookingForm.guest_count} onChange={e => setBookingForm(p => ({ ...p, guest_count: e.target.value }))} />
+              </div>
+              <div className="space-y-2">
+                <Label>סטטוס</Label>
+                <Select value={bookingForm.status} onValueChange={v => setBookingForm(p => ({ ...p, status: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="confirmed">מאושר</SelectItem>
+                    <SelectItem value="pending">ממתין</SelectItem>
+                    <SelectItem value="cancelled">בוטל</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end pt-2">
+              <Button variant="outline" onClick={() => setBookingOpen(false)}>ביטול</Button>
+              <Button onClick={saveBooking} disabled={savingBooking}>{savingBooking ? 'שומר...' : 'שמור'}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       {/* Clean Summary Header */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="bg-gradient-to-br from-destructive/10 to-destructive/5 border-destructive/20 cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/manager/requests')}>
