@@ -23,8 +23,6 @@
     signOut: 'התנתקות',
     reminders: 'התראות ותזכורות',
     vendorTasks: 'נותני שירות',
-    reminders: 'התראות ותזכורות',
-    vendorTasks: 'נותני שירות',
   },
   roles: { owner: 'בעל נכס', manager: 'מנהל נכסים' },
   pageTitles: {
