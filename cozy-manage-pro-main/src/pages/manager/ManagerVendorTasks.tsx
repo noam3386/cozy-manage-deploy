@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
-  Plus, Wrench, Users, ClipboardList, Send, Settings2,
-  CheckCircle, Clock, AlertTriangle, Package, Building2,
-  Bell, Trash2, Eye
+  Plus, Users, Building2, Clock, AlertTriangle, Package, Bell, Trash2, Eye, Pencil
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
@@ -47,15 +45,22 @@ export default function ManagerVendorTasks() {
 
   // New task dialog
   const [taskOpen, setTaskOpen] = useState(false);
-  const [taskForm, setTaskForm] = useState({ vendor_id: '', property_id: '', title: '', description: '', scheduled_date: '', scheduled_time: '', service_type: 'cleaning' });
+  const [taskForm, setTaskForm] = useState({
+    vendor_id: '', property_id: '', title: '', description: '',
+    scheduled_date: '', scheduled_time: '', service_type: 'cleaning'
+  });
 
-  // New vendor user dialog
-  const [vendorUserOpen, setVendorUserOpen] = useState(false);
-  const [vendorUserForm, setVendorUserForm] = useState({ vendor_id: '', email: '', password: '' });
+  // Edit vendor dialog
+  const [editVendorOpen, setEditVendorOpen] = useState(false);
+  const [editingVendor, setEditingVendor] = useState<Vendor | null>(null);
+  const [editVendorForm, setEditVendorForm] = useState({ name: '', phone: '', email: '' });
 
   // Auto rules dialog
   const [ruleOpen, setRuleOpen] = useState(false);
-  const [ruleForm, setRuleForm] = useState({ vendor_id: '', property_id: '', service_type: 'cleaning', trigger_type: 'after_departure', trigger_days: 1 });
+  const [ruleForm, setRuleForm] = useState({
+    vendor_id: '', property_id: '', service_type: 'cleaning',
+    trigger_type: 'after_departure', trigger_days: 1
+  });
 
   // Report view dialog
   const [reportOpen, setReportOpen] = useState(false);
@@ -107,34 +112,31 @@ export default function ManagerVendorTasks() {
     setSubmitting(false);
   };
 
-  const createVendorUser = async () => {
-    if (!vendorUserForm.vendor_id || !vendorUserForm.email || !vendorUserForm.password) {
-      toast.error('נא למלא את כל השדות'); return;
+  const openEditVendor = (vendor: Vendor) => {
+    setEditingVendor(vendor);
+    setEditVendorForm({ name: vendor.name, phone: vendor.phone, email: vendor.email || '' });
+    setEditVendorOpen(true);
+  };
+
+  const saveVendorEdit = async () => {
+    if (!editingVendor) return;
+    if (!editVendorForm.name || !editVendorForm.phone) {
+      toast.error('שם וטלפון הם שדות חובה'); return;
     }
     setSubmitting(true);
-    // Create user via Supabase Auth Admin (using edge function or direct)
-    const { data, error } = await supabase.auth.admin.createUser({
-      email: vendorUserForm.email,
-      password: vendorUserForm.password,
-      email_confirm: true,
-    });
-    if (error || !data.user) {
-      toast.error('שגיאה ביצירת משתמש: ' + (error?.message || ''));
-      setSubmitting(false); return;
+    const { error } = await supabase.from('vendors').update({
+      name: editVendorForm.name,
+      phone: editVendorForm.phone,
+      email: editVendorForm.email || null,
+    }).eq('id', editingVendor.id);
+    if (!error) {
+      toast.success('פרטי נותן השירות עודכנו');
+      setEditVendorOpen(false);
+      setEditingVendor(null);
+      fetchAll();
+    } else {
+      toast.error('שגיאה בעדכון הפרטים');
     }
-    // Assign vendor role
-    await supabase.from('user_roles').insert({ user_id: data.user.id, role: 'vendor' as any });
-    // Link to vendor
-    const vendor = vendors.find(v => v.id === vendorUserForm.vendor_id);
-    await supabase.from('vendor_assignments').insert({
-      vendor_id: vendorUserForm.vendor_id,
-      property_id: properties[0]?.id, // will be updated per property assignment
-      user_id: data.user.id,
-      service_type: vendor?.specialty?.[0] || 'cleaning',
-    });
-    toast.success('משתמש נותן שירות נוצר בהצלחה!');
-    setVendorUserOpen(false);
-    setVendorUserForm({ vendor_id: '', email: '', password: '' });
     setSubmitting(false);
   };
 
@@ -179,10 +181,6 @@ export default function ManagerVendorTasks() {
           <p className="text-muted-foreground text-sm mt-0.5">משימות, אוטומציות ודוחות</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" onClick={() => setVendorUserOpen(true)}>
-            <Plus className="w-4 h-4 ml-1" />
-            הוסף משתמש לנותן שירות
-          </Button>
           <Button variant="outline" onClick={() => setRuleOpen(true)}>
             <Bell className="w-4 h-4 ml-1" />
             כלל אוטומציה
@@ -197,6 +195,7 @@ export default function ManagerVendorTasks() {
       <Tabs defaultValue="tasks">
         <TabsList className="w-full">
           <TabsTrigger value="tasks" className="flex-1">משימות ({tasks.length})</TabsTrigger>
+          <TabsTrigger value="vendors" className="flex-1">נותני שירות ({vendors.length})</TabsTrigger>
           <TabsTrigger value="reports" className="flex-1">דוחות ({reports.length})</TabsTrigger>
           <TabsTrigger value="automation" className="flex-1">אוטומציה ({autoRules.length})</TabsTrigger>
         </TabsList>
@@ -232,6 +231,47 @@ export default function ManagerVendorTasks() {
                     </Button>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          ))}
+        </TabsContent>
+
+        {/* Vendors Tab */}
+        <TabsContent value="vendors" className="space-y-3 mt-4">
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="p-3 text-sm text-blue-800">
+              <p className="font-semibold mb-1">כיצד ליצור חשבון לנותן שירות?</p>
+              <ol className="list-decimal list-inside space-y-1 text-xs">
+                <li>שלח לנותן השירות את כתובת האתר</li>
+                <li>בקש ממנו להירשם בעצמו עם כתובת המייל שלו</li>
+                <li>לאחר ההרשמה, היכנס ל-Supabase → Authentication → Users</li>
+                <li>מצא את המשתמש והעתק את ה-ID שלו</li>
+                <li>היכנס ל-Table Editor → user_roles → הוסף שורה עם ה-ID ו-role=vendor</li>
+              </ol>
+            </CardContent>
+          </Card>
+
+          {vendors.length === 0 ? (
+            <Card><CardContent className="py-12 text-center text-muted-foreground">אין נותני שירות</CardContent></Card>
+          ) : vendors.map(vendor => (
+            <Card key={vendor.id}>
+              <CardContent className="p-4 flex items-center justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold">{vendor.name}</p>
+                  <p className="text-sm text-muted-foreground">{vendor.phone}</p>
+                  {vendor.email && <p className="text-xs text-muted-foreground">{vendor.email}</p>}
+                  {vendor.specialty && vendor.specialty.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {vendor.specialty.map((s, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{s}</Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" onClick={() => openEditVendor(vendor)}>
+                  <Pencil className="w-3 h-3 ml-1" />
+                  ערוך
+                </Button>
               </CardContent>
             </Card>
           ))}
@@ -364,31 +404,43 @@ export default function ManagerVendorTasks() {
         </DialogContent>
       </Dialog>
 
-      {/* Vendor User Dialog */}
-      <Dialog open={vendorUserOpen} onOpenChange={setVendorUserOpen}>
+      {/* Edit Vendor Dialog */}
+      <Dialog open={editVendorOpen} onOpenChange={setEditVendorOpen}>
         <DialogContent dir="rtl" className="max-w-sm">
-          <DialogHeader><DialogTitle>הוסף משתמש לנותן שירות</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>עריכת פרטי נותן שירות</DialogTitle></DialogHeader>
           <div className="space-y-3 py-2">
             <div className="space-y-1">
-              <Label>נותן שירות</Label>
-              <Select value={vendorUserForm.vendor_id} onValueChange={v => setVendorUserForm(p => ({ ...p, vendor_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="בחר..." /></SelectTrigger>
-                <SelectContent>{vendors.map(v => <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>)}</SelectContent>
-              </Select>
+              <Label>שם</Label>
+              <Input
+                value={editVendorForm.name}
+                onChange={e => setEditVendorForm(p => ({ ...p, name: e.target.value }))}
+                placeholder="שם נותן השירות"
+              />
             </div>
             <div className="space-y-1">
-              <Label>אימייל</Label>
-              <Input type="email" value={vendorUserForm.email} onChange={e => setVendorUserForm(p => ({ ...p, email: e.target.value }))} placeholder="vendor@email.com" dir="ltr" />
+              <Label>טלפון</Label>
+              <Input
+                value={editVendorForm.phone}
+                onChange={e => setEditVendorForm(p => ({ ...p, phone: e.target.value }))}
+                placeholder="05X-XXXXXXX"
+                dir="ltr"
+              />
             </div>
             <div className="space-y-1">
-              <Label>סיסמא ראשונית</Label>
-              <Input type="password" value={vendorUserForm.password} onChange={e => setVendorUserForm(p => ({ ...p, password: e.target.value }))} placeholder="לפחות 6 תווים" dir="ltr" />
+              <Label>אימייל (אופציונלי)</Label>
+              <Input
+                type="email"
+                value={editVendorForm.email}
+                onChange={e => setEditVendorForm(p => ({ ...p, email: e.target.value }))}
+                placeholder="vendor@email.com"
+                dir="ltr"
+              />
             </div>
             <div className="bg-muted rounded p-2 text-xs text-muted-foreground">
-              נותן השירות יוכל להיכנס עם אימייל וסיסמא זו ולראות את המשימות שלו
+              לא ניתן לשנות סיסמא מכאן — נותן השירות יכול לשנות סיסמא דרך "שכחתי סיסמא" בדף ההתחברות
             </div>
-            <Button onClick={createVendorUser} disabled={submitting} className="w-full">
-              {submitting ? 'יוצר...' : 'צור משתמש'}
+            <Button onClick={saveVendorEdit} disabled={submitting} className="w-full">
+              {submitting ? 'שומר...' : 'שמור שינויים'}
             </Button>
           </div>
         </DialogContent>
@@ -414,22 +466,62 @@ export default function ManagerVendorTasks() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>מתי לשלוח?</Label>
+              <Label>טריגר</Label>
               <Select value={ruleForm.trigger_type} onValueChange={v => setRuleForm(p => ({ ...p, trigger_type: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="before_departure">לפני עזיבה</SelectItem>
-                  <SelectItem value="after_departure">אחרי עזיבה</SelectItem>
+                  <SelectItem value="after_departure">אחרי עזיבת אורח</SelectItem>
+                  <SelectItem value="before_departure">לפני עזיבת אורח</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>כמה ימים?</Label>
-              <Input type="number" min={0} max={30} value={ruleForm.trigger_days}
-                onChange={e => setRuleForm(p => ({ ...p, trigger_days: Number(e.target.value) }))} />
+              <Label>מספר ימים</Label>
+              <Input
+                type="number"
+                min={0}
+                value={ruleForm.trigger_days}
+                onChange={e => setRuleForm(p => ({ ...p, trigger_days: Number(e.target.value) }))}
+              />
             </div>
-            <Button onClick={createRule} className="w-full">שמור כלל</Button>
+            <Button onClick={createRule} className="w-full">צור כלל</Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Report View Dialog */}
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent dir="rtl" className="max-w-sm">
+          <DialogHeader><DialogTitle>פרטי דוח</DialogTitle></DialogHeader>
+          {selectedReport && (
+            <div className="space-y-3 py-2">
+              {selectedReport.missing_supplies.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-orange-600 mb-1">חומרים חסרים:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedReport.missing_supplies.map((s, i) => <Badge key={i} variant="outline">{s}</Badge>)}
+                  </div>
+                </div>
+              )}
+              {selectedReport.issues.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-red-600 mb-1">בעיות:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedReport.issues.map((s, i) => <Badge key={i} variant="destructive">{s}</Badge>)}
+                  </div>
+                </div>
+              )}
+              {selectedReport.notes && (
+                <div>
+                  <p className="text-sm font-semibold mb-1">הערות:</p>
+                  <p className="text-sm bg-muted rounded p-2">{selectedReport.notes}</p>
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">
+                הוגש: {format(new Date(selectedReport.submitted_at), 'dd/MM/yyyy HH:mm', { locale: he })}
+              </p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
